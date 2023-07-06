@@ -4,29 +4,29 @@
 
 # Requisitos
 
-[ ] Tipos inteiros e reais
-[ ] Funções de entrada e saída
-    [ ] Ler
-    [ ] Escrever
-[ ] Estrutura de repetição Enquanto
-[ ] Estruturas condicionais
-    [ ] Se Entao
-    [ ] Se Entao Senao
-[ ] Operadores aritméticos
-    [ ] Soma +
-    [ ] Subtração -
-    [ ] Multiplicação *
-    [ ] Divisão /
-[ ] Operadores relacionais
-    [ ] Igualdade =
-    [ ] Diferença <>
-    [ ] Menor <
-    [ ] Menor ou igual <=
-    [ ] Maior >
-    [ ] Maior ou igual >=
-[ ] Comentários `/* ... */`
-[ ] Atribuição =
-[ ] Strings "..." com escapes \n e \t
+- [ ] Tipos inteiros e reais
+- [ ] Funções de entrada e saída
+  - [ ] Ler
+  - [ ] Escrever
+- [ ] Estrutura de repetição Enquanto
+- [ ] Estruturas condicionais
+  - [ ] Se Entao
+  - [ ] Se Entao Senao
+- [ ] Operadores aritméticos
+  - [ ] Soma          +
+  - [ ] Subtração     -
+  - [ ] Multiplicação *
+  - [ ] Divisão       /
+- [ ] Operadores relacionais
+  - [ ] Igualdade      ==
+  - [ ] Diferença      !=
+  - [ ] Menor          <
+  - [ ] Menor ou igual <=
+  - [ ] Maior          >
+  - [ ] Maior ou igual >=
+- [ ] Comentários `/* ... */`
+- [ ] Atribuição =
+- [ ] Strings "..." com escapes \n e \t
 
 # Requisitos não implementados
 
