@@ -1,97 +1,118 @@
 %{
 #include <stdlib.h>
+#include <stdio.h>
 #if 0
 #include "fortall.h"
-#include "y.tab.h"
 #endif
+#include "y.tab.h"
 
-char buf[100];
+char  buf[CAPACITY_STRING];
 char *s;
-// Educative string tutorial.
-// TODO Make dynamic.
 
-void yyerror(char *error) { printf("%s\n", error); }
+static inline void check_buf(void)
+{
+    if (s - buf == CAPACITY_STRING - 1)
+    {
+        fprintf(stderr, "String is too long.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void yyerror(char *);
 %}
+
 %x COMMENT
 %x STRING
 
 %%
 
  /* Início. */
-"publico"   printf("public\n");
-"estatico"  printf("static\n");
-"vacuo"     printf("void\n");
-"principal" printf("main\n");
+"publico"   return PUBLICO;
+"estatico"  return ESTATICO;
+"abismo"    return ABISMO;
+"principal" return PRINCIPAL;
 
  /* Tipos. */
-"caractere" printf("Tipo caractere\n"); 
-"inteiro"   printf("Tipo inteiro\n");
-"real"      printf("Tipo real\n");
+"caractere" return CARACTERE;
+"inteiro"   return INTEIRO;
+"real"      return REAL;
 
  /* Estruturas condicionais. */
-"se"    printf("Se\n");
-"entao" printf("Então\n");
-"senao" printf("senao\n");
+"se"    return SE;
+"entao" return ENTAO;
+"senao" return SENAO;
 
  /* Estrutura de repetição. */
-"enquanto" printf("Enquanto\n");
+"enquanto" return ENQUANTO;
 
  /* Entrada e saída. */
-"escrever" printf("Escrever\n");
-"ler"      printf("Ler\n");
+"escrever" return ESCREVER;
+"ler"      return LER;
 
  /* Subtração, soma, multiplicação, divisão, módulo. */
  /* Parêntesis, chaves. */
  /* Maior e menor, negação, atribuição, ponto e vírgula, vírgula. */
-[-+*/%(){}<>!=;,] printf("Achei %c\n", *yytext);
+[-+*/%(){}<>!=;,] return *yytext;
 
  /* Operadores relacionais. */
-">=" printf("Maior ou igual\n");
-"<=" printf("Menor ou igual\n");
-"==" printf("Igualdade\n");
-"!=" printf("Diferente\n");
+">=" return GE;
+"<=" return LE;
+"==" return EQ;
+"!=" return NE;
 
  /* Operadores lógicos. */
-"&&" printf("Operação lógica E\n");
-"||" printf("Operação lógica OU\n");
+"&&" return AND;
+"||" return OR;
 
  /* Comentários. */
-"/*"          { BEGIN COMMENT; printf("Abre comentário\n");  }      
+ /* TODO "/*"  ([^*]|(\*[^/]?))*   "*/" */
+
+"/*"          BEGIN COMMENT;
 <COMMENT>.
-<COMMENT>"*/" { BEGIN 0;       printf("Fecha comentário\n"); }
+<COMMENT>"*/" BEGIN 0;
 
  /* Cadeias de caracteres. */
+ /* BUG Does not check `buf` limit */
 \"           { BEGIN STRING; s = buf; }
-<STRING>\\n  { *s++ = '\n';           }
-<STRING>\\t  { *s++ = '\t';           }
-<STRING>\\\" { *s++ = '\"';           }
-<STRING>\\\\ { *s++ = '\\';           }
+<STRING>\\n  { check_buf(); *s++ = '\n'; }
+<STRING>\\t  { check_buf(); *s++ = '\t'; }
+<STRING>\\\" { check_buf(); *s++ = '\"'; }
+<STRING>\\\\ { check_buf(); *s++ = '\\'; }
 <STRING>\n   { fprintf(stderr, "Invalid string\n"); exit(EXIT_FAILURE); }
 <STRING>\"   {
                  *s = '\0';
                  BEGIN 0;
-                 printf("String identificada: %s\n", buf);
+                 yylval.string = malloc(strlen(buf));
+                 if (NULL == string)
+                 {
+                     fprintf(stderr, "No memory for string.\n");
+                     exit(EXIT_FAILURE);
+                 }
+                 strcpy(string, buf);
+                 return LITERAL;
              }
-<STRING>.    { *s++ = *yytext;        }
+<STRING>.    { check_buf(); *s++ = *yytext; }
 
  /* Literal de caractere. */
-'\\t'  printf("Reconheceu caractere tab\n");
-'\\n'  printf("Reconheceu caractere de nova linha\n");
-'\\\"' printf("Reconheceu caractere de aspas\n");
-'\\\\' printf("Reconheceu caractere barra\n");
-'.'    printf("Reconheceu caractere '%c'\n", yytext[1]);
+'\\t'  { yylval.literal_char =    '\t'; return LITERAL_CHAR; }
+'\\n'  { yylval.literal_char =    '\n'; return LITERAL_CHAR; }
+'\\\"' { yylval.literal_char =    '\\'; return LITERAL_CHAR; }
+'\\\\' { yylval.literal_char =    '\"'; return LITERAL_CHAR; }
+'.'    { yylval.literal_char = *yytext; return LITERAL_CHAR; }
 
  /* Números inteiros. */
-[0-9]+ printf("Reconheci %d\n", atoi(yytext));
+[0-9]+ { yylval.literal_int = atoi(yytext); return LITERAL_INT; }
 
  /* Números reais. */
-[0-9]*\.[0-9]* printf("Reconheci %f\n", strtod(yytext, NULL));
+[0-9]*\.[0-9]* { yylval.literal_real = strtod(yytext, NULL); return LITERAL_REAL; }
 
  /* Variáveis. */
-[a-zA-Z_][a-zA-Z0-9_]* printf("Achei uma variável %s\n", yytext);
+[a-zA-Z_][a-zA-Z0-9_]* {
+                           int id = 
+                       }
 
  /* Espaço em branco. */
-[ \t\n]+ printf("Espaço em branco\n");
+[ \t\n]+
 
  /* Caracteres desconhecidos. */
 . yyerror("Caractere desconhecido");
@@ -101,10 +122,4 @@ void yyerror(char *error) { printf("%s\n", error); }
 int yywrap(void)
 {
     return 1;
-}
-
-int main(void)
-{
-    yylex();
-    return 0;
 }
