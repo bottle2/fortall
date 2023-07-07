@@ -1,8 +1,15 @@
-fortall:lex.yy.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ lex.yy.c $(LDLIBS)
+CFLAGS=-Wpedantic -Wall -Wextra
 
-lex.yy.c:fortall.l
+all:fortall
+
+fortall:lex.yy.c y.tab.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ lex.yy.c y.tab.c $(LDLIBS)
+
+lex.yy.c:fortall.l y.tab.h fortall.h
 	lex $<
 
+y.tab.h y.tab.c:fortall.y fortall.h
+	yacc -d -t $<
+
 clean:
-	rm -f lex.yy.c fortall
+	rm -f lex.yy.c y.tab.h y.tab.c fortall

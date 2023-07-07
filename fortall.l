@@ -1,9 +1,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#if 0
 #include "fortall.h"
-#endif
 #include "y.tab.h"
 
 char  buf[CAPACITY_STRING];
@@ -65,8 +63,6 @@ void yyerror(char *);
 "||" return OR;
 
  /* Comentários. */
- /* TODO "/*"  ([^*]|(\*[^/]?))*   "*/" */
-
 "/*"          BEGIN COMMENT;
 <COMMENT>.
 <COMMENT>"*/" BEGIN 0;
@@ -82,33 +78,34 @@ void yyerror(char *);
 <STRING>\"   {
                  *s = '\0';
                  BEGIN 0;
-                 yylval.string = malloc(strlen(buf));
-                 if (NULL == string)
+                 yylval.string_literal = malloc(strlen(buf) + 1);
+                 if (NULL == yylval.string_literal)
                  {
                      fprintf(stderr, "No memory for string.\n");
                      exit(EXIT_FAILURE);
                  }
-                 strcpy(string, buf);
-                 return LITERAL;
+                 strcpy(yylval.string_literal, buf);
+                 return STRING_LITERAL;
              }
 <STRING>.    { check_buf(); *s++ = *yytext; }
 
  /* Literal de caractere. */
-'\\t'  { yylval.literal_char =    '\t'; return LITERAL_CHAR; }
-'\\n'  { yylval.literal_char =    '\n'; return LITERAL_CHAR; }
-'\\\"' { yylval.literal_char =    '\\'; return LITERAL_CHAR; }
-'\\\\' { yylval.literal_char =    '\"'; return LITERAL_CHAR; }
-'.'    { yylval.literal_char = *yytext; return LITERAL_CHAR; }
+'\\t'  { yylval.char_const =    '\t'; return CHAR_CONST; }
+'\\n'  { yylval.char_const =    '\n'; return CHAR_CONST; }
+'\\\"' { yylval.char_const =    '\\'; return CHAR_CONST; }
+'\\\\' { yylval.char_const =    '\"'; return CHAR_CONST; }
+'.'    { yylval.char_const = *yytext; return CHAR_CONST; }
 
  /* Números inteiros. */
-[0-9]+ { yylval.literal_int = atoi(yytext); return LITERAL_INT; }
+[0-9]+ { yylval.int_const = atoi(yytext); return INT_CONST; }
 
  /* Números reais. */
-[0-9]*\.[0-9]* { yylval.literal_real = strtod(yytext, NULL); return LITERAL_REAL; }
+[0-9]*\.[0-9]* { yylval.real_const = strtod(yytext, NULL); return REAL_CONST; }
 
  /* Variáveis. */
 [a-zA-Z_][a-zA-Z0-9_]* {
-                           int id = 
+                           yylval.var_id = var_find_or_set(yytext);
+                           return VAR_ID;
                        }
 
  /* Espaço em branco. */

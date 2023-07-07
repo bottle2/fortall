@@ -1,9 +1,12 @@
-publico estatico vacuo principal()
+publico estatico abismo principal()
 {
-    inteiro   vasco_da_gama =  0;
-    real      saldo_do_RU   = -1;
+    inteiro   vasco_da_gama;
+    real      saldo_do_RU;
     inteiro   aluno;
     caractere resposta;
+
+    vasco_da_gama =  0;
+    saldo_do_RU   = -1;
 
     /* TODO Refatorar depois */
     enquanto (vasco_da_gama < 3)
@@ -18,13 +21,13 @@ publico estatico vacuo principal()
     se (aluno < 0 || aluno >= 3) entao {
         escrever("Voce nao existe\n");
     }
-    senao se (aluno == 2) entao
+    senao se (aluno == 2) entao {
         escrever("banido do RU pra sempre!!\n");
         escrever("voce quer saber porque? (Y/N) ");
-        ler(resposta)
+        ler(resposta);
         se ('Y' == resposta) entao
             escrever("Essa informacao eh sigilosa.\n");
-        senao ('N' == resposta) entao
+        senao se ('N' == resposta) entao
             escrever("OK.\n");
         senao {
             escrever("Motivos:\n");
@@ -32,7 +35,7 @@ publico estatico vacuo principal()
             escrever("- Subir pelado na mesa\n");
             escrever("- Nao sabe responder uma pergunta de sim ou nao\n");
         }
-    senao
+    } senao
     {
         escrever("Digite seu saldo: ");
         ler(saldo_do_ru);

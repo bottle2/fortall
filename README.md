@@ -39,3 +39,6 @@
 - Tipo lógico
 - Registros
 - Outros tipos de dados
+
+# Rascunho
+ TODO "/*"  ([^*]|(\*[^/]?))*   "*/"
