@@ -1,0 +1,47 @@
+publico estatico vacuo principal()
+{
+    inteiro   vasco_da_gama =  0;
+    real      saldo_do_RU   = -1;
+    inteiro   aluno;
+    caractere resposta;
+
+    /* TODO Refatorar depois */
+    enquanto (vasco_da_gama < 3)
+    {
+        vasco_da_gama = vasco_da_gama + 1;
+        escrever("iniciando sistema...\n");
+    }
+
+    escrever("A sua matricula eh 1 ou 2? ");
+    ler(aluno);
+
+    se (aluno < 0 || aluno >= 3) entao {
+        escrever("Voce nao existe\n");
+    }
+    senao se (aluno == 2) entao
+        escrever("banido do RU pra sempre!!\n");
+        escrever("voce quer saber porque? (Y/N) ");
+        ler(resposta)
+        se ('Y' == resposta) entao
+            escrever("Essa informacao eh sigilosa.\n");
+        senao ('N' == resposta) entao
+            escrever("OK.\n");
+        senao {
+            escrever("Motivos:\n");
+            escrever("- Promover rinha de galo no porao do RU\n");
+            escrever("- Subir pelado na mesa\n");
+            escrever("- Nao sabe responder uma pergunta de sim ou nao\n");
+        }
+    senao
+    {
+        escrever("Digite seu saldo: ");
+        ler(saldo_do_ru);
+
+        se (saldo_do_ru > 2.5) entao {
+            escrever("Voce pode comer guisado :D\n");
+            saldo_do_RU = saldo_do_RU - 2.5;
+        }
+    }
+    
+    escrever("flamengo nao eh time\n");
+}
