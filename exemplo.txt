@@ -1,9 +1,9 @@
 publico estatico abismo principal()
 {
-    inteiro   vasco_da_gama;
-    real      saldo_do_RU;
     inteiro   aluno;
+    inteiro   vasco_da_gama;
     caractere resposta;
+    real      saldo_do_RU;
 
     vasco_da_gama =  0;
     saldo_do_RU   = -1;
@@ -38,9 +38,9 @@ publico estatico abismo principal()
     } senao
     {
         escrever("Digite seu saldo: ");
-        ler(saldo_do_ru);
+        ler(saldo_do_RU);
 
-        se (saldo_do_ru > 2.5) entao {
+        se (saldo_do_RU > 2.5) entao {
             escrever("Voce pode comer guisado :D\n");
             saldo_do_RU = saldo_do_RU - 2.5;
         }

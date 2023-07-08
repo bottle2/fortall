@@ -8,21 +8,34 @@
 void yyerror(char *);
 int yylex(void);
 
-struct var
-{
-    char *name;
-    enum  { TYPE_UNDEFINED, TYPE_CHAR, TYPE_INT,   TYPE_REAL } type;
-    union {                 char c;    int  i;   double r;   };
-};
+
 int n_var;
 
 struct var vars[CAPACITY_VAR];
+
+void show_variables(void)
+{
+    for (int i = 0; i < n_var; i++)
+    {
+        char name_char;
+        switch(vars[i].value.type)
+        {
+            case TYPE_CHAR:         name_char = 'C';    break;
+            case TYPE_INT:          name_char = 'I';    break;
+            case TYPE_REAL:         name_char = 'R';    break;
+            case TYPE_UNDEFINED:    name_char = 'U';    break;
+            default:                name_char = '?';    break;
+        }
+
+        printf("A %i-esima variavel mais cringe do sistema é:\t%s\t%c \n", i, vars[i].name, name_char);
+    }
+}
 
 int var_find_or_set(char name[static 2])
 {
     int var_i = 0;
 
-    while (var_i < n_var && !strcmp(name, vars[var_i].name))
+    while (var_i < n_var && strcmp(name, vars[var_i].name))
     {
         var_i++;
     }
@@ -41,7 +54,9 @@ int var_find_or_set(char name[static 2])
             exit(EXIT_FAILURE);
         }
 
+        printf("Defini uma variável foda de nome %s. \n", name);
         (void)strcpy(vars[var_i].name, name);
+        n_var++;
     }
 
     return var_i;
@@ -55,12 +70,14 @@ int var_find_or_set(char name[static 2])
 %token ENQUANTO
 %token ESCREVER LER
 
+/* Definição de um Token*/
 %union {
     char   *string_literal;
     char    char_const;
     int      int_const;
     double  real_const;
     int     var_id;
+    enum type type;
 }
 
 %token <string_literal> STRING_LITERAL
@@ -80,9 +97,13 @@ int var_find_or_set(char name[static 2])
 %nonassoc SEX
 %nonassoc SENAO
 
+/* não terminais */
+%type <type>         tipo lista_nomes
+
+
 %%
 
-programa : PUBLICO ESTATICO ABISMO PRINCIPAL '(' ')' '{' declaracao '}' { printf("Reconheci um programa\n"); }
+programa : PUBLICO ESTATICO ABISMO PRINCIPAL '(' ')' '{' declaracao '}' { printf("Reconheci um programa\n"); show_variables(); exit(0); }
 	 ;
 
 declaracao : dec_variavel comando lista_comando { printf("Reconheci uma declaracao\n"); }
@@ -92,16 +113,13 @@ dec_variavel : tipo lista_nomes ';' dec_variavel { printf("Reconheci decl de var
              | 
              ;
 
-lista_nomes : VAR_ID lista_n
-	    ;
-
-lista_n : ',' VAR_ID lista_n
-        |
-        ;
-
-tipo : INTEIRO
-     | CARACTERE
-     | REAL
+lista_nomes : lista_nomes ',' VAR_ID {vars[$3].value.type = $<type>0;}  
+            | VAR_ID {vars[$1].value.type = $<type>0; } 
+	        ;
+        
+tipo : INTEIRO      {$$ = TYPE_INT;}
+     | CARACTERE    {$$ = TYPE_CHAR;}
+     | REAL         {$$ = TYPE_REAL;}
      ;
 
 comando : SE       '(' exp ')' ENTAO comando %prec SEX     { printf("Se simples\n");   }
