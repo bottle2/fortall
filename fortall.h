@@ -1,14 +1,29 @@
 #ifndef FORTALL_H
 
+#include <stdbool.h>
+
 #define CAPACITY_VAR    4095
 #define CAPACITY_STRING 4095
 
 int var_find_or_set(char name[static 2]);
 
 /* constants */
-struct generic_value{
-    enum type { TYPE_UNDEFINED, TYPE_CHAR, TYPE_INT,   TYPE_REAL} type;
-    union {                     char c;    int  i;      double r;   };
+struct generic_value
+{
+    enum type
+    {
+        TYPE_UNDEFINED,
+        TYPE_CHAR,
+        TYPE_INT,
+        TYPE_REAL
+    } type;
+
+    union
+    {
+        char   c;
+        int    i;
+        double r;
+    };
 };
 
 /* operators */
@@ -21,14 +36,21 @@ struct op_tree_node{
 // Elemento genérico da Arvore
 struct tree_node 
 {   
-    enum  { CONST,           VID,           OPR}        type;
-    union { struct generic_value con; int var_id; struct op_tree_node opr;};
+    enum { CONST, VID, OPR, STRING} type;
+    union
+    {
+        struct generic_value  con;
+        int                   var_id;
+        struct op_tree_node   opr;
+        char                 *str;
+    };
 };
 
 //Definição formal da Variavel
 struct var
 {
     char *name;
+    bool   is_initialized;
     struct generic_value value;
 };
 

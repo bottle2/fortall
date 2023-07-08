@@ -1,4 +1,5 @@
 %{
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +8,6 @@
 
 void yyerror(char *);
 int yylex(void);
-
 
 int n_var;
 
@@ -48,7 +48,7 @@ int var_find_or_set(char name[static 2])
 
     if (var_i == n_var)
     {
-        if (NULL == (vars[var_i].name = malloc(strlen(name))))
+        if (NULL == (vars[var_i].name = malloc(strlen(name) + 1)))
         {
             fprintf(stderr, "Can't store variable name.\n");
             exit(EXIT_FAILURE);
@@ -61,6 +61,8 @@ int var_find_or_set(char name[static 2])
 
     return var_i;
 }
+
+struct tree_node opr(int oper, int nops, ...);
 
 %}
 
@@ -77,7 +79,9 @@ int var_find_or_set(char name[static 2])
     int      int_const;
     double  real_const;
     int     var_id;
-    enum type type;
+
+    enum   type      type;
+    struct tree_node node;
 }
 
 %token <string_literal> STRING_LITERAL
@@ -98,15 +102,15 @@ int var_find_or_set(char name[static 2])
 %nonassoc SENAO
 
 /* não terminais */
-%type <type>         tipo lista_nomes
-
+%type <type> tipo
+%type <node> var exp comando lista_comando
 
 %%
 
 programa : PUBLICO ESTATICO ABISMO PRINCIPAL '(' ')' '{' declaracao '}' { printf("Reconheci um programa\n"); show_variables(); exit(0); }
 	 ;
 
-declaracao : dec_variavel comando lista_comando { printf("Reconheci uma declaracao\n"); }
+declaracao : dec_variavel lista_comando { printf("Reconheci uma declaracao\n"); }
 	   ;
 
 dec_variavel : tipo lista_nomes ';' dec_variavel { printf("Reconheci decl de var\n"); }
@@ -115,48 +119,47 @@ dec_variavel : tipo lista_nomes ';' dec_variavel { printf("Reconheci decl de var
 
 lista_nomes : lista_nomes ',' VAR_ID {vars[$3].value.type = $<type>0;}  
             | VAR_ID {vars[$1].value.type = $<type>0; } 
-	        ;
+            ;
         
 tipo : INTEIRO      {$$ = TYPE_INT;}
      | CARACTERE    {$$ = TYPE_CHAR;}
      | REAL         {$$ = TYPE_REAL;}
      ;
 
-comando : SE       '(' exp ')' ENTAO comando %prec SEX     { printf("Se simples\n");   }
-        | SE       '(' exp ')' ENTAO comando SENAO comando { printf("Se com senao\n"); }
-        | ENQUANTO '(' exp ')' comando                     { printf("Entao\n"); }
-        | VAR_ID '=' exp ';'                  { printf("Atribuicao\n"); }
-        | ESCREVER '(' STRING_LITERAL ')' ';' { printf("Escrevi string\n"); }
-        | ESCREVER '(' exp            ')' ';' { printf("Escrevi exp\n"); }
-        | LER      '(' var            ')' ';' { printf("Li var\n"); } 
-        | '{' comando lista_comando '}'       { printf("lista de comando\n"); }
+comando : SE       '(' exp ')' ENTAO comando %prec SEX     { $$ = opr(SE      , 2, $3, $6);     }
+        | SE       '(' exp ')' ENTAO comando SENAO comando { $$ = opr(SE      , 3, $3, $6, $8); }
+        | ENQUANTO '(' exp ')' comando                     { $$ = opr(ENQUANTO, 2, $3, $5);     }
+        | var '=' exp ';'                                  { $$ = opr('='     , 2, $1, $3);     }
+        | ESCREVER '(' STRING_LITERAL ')' ';'              { $$ = opr(ESCREVER, 1, (struct tree_node){STRING, .str = $3}); }
+        | ESCREVER '(' exp            ')' ';'              { $$ = opr(ESCREVER, 1, $3); }
+        | LER      '(' var            ')' ';'              { $$ = opr(LER     , 1, $3); } 
+        | '{' lista_comando '}'                            { $$ = $2; }
         ;
 
-lista_comando : comando lista_comando
-	      |
+var : VAR_ID { $$ = (struct tree_node){VID, .var_id = $1}; }
+
+lista_comando : lista_comando comando { $$ = opr(';', 2, $1, $2); }
+	      | comando               { $$ = $1; }
 	      ;
 
-var : VAR_ID { printf("Reconheci variavel\n"); };
-    ;
-
-exp : CHAR_CONST   { printf("Reconheci constante de caractere\n"); }
-    |  INT_CONST   { printf("Reconheci constante inteira\n"); }
-    | REAL_CONST   { printf("Reconheci constante real\n"); }
-    | var          { printf("Reconheci variavel\n"); }
-    | '(' exp ')'  { printf("Reconheci parentesis\n"); }
-    | '-' exp %prec UMINUS { printf("Reconheci uminus\n"); }
-    | '!' exp %prec UNEG   { printf("Reconheci uma negacao\n"); }
-    | exp '+' exp { printf("Reconheci uma soma\n"); }
-    | exp '-' exp { printf("Reconheci uma subtracao\n"); }
-    | exp '*' exp { printf("Reconheci uma multiplicacao\n"); }
-    | exp '/' exp { printf("Reconheci uma divisao\n"); }
-    | exp EQ  exp { printf("Reconheci uma comparacao ==\n"); }
-    | exp GE  exp { printf("Reconheci uma comparacao >=\n"); }
-    | exp LE  exp { printf("Reconheci uma comparacao <=\n"); }
-    | exp '>' exp { printf("Reconheci uma comparacao >\n"); }
-    | exp '<' exp { printf("Reconheci uma comparacao <\n"); }
-    | exp AND exp { printf("Reconheci um AND\n"); }
-    | exp OR  exp { printf("Reconheci um OR\n");  }
+exp : CHAR_CONST  { $$.type = CONST; $$.con.c  = $1; $$.con.type = TYPE_CHAR; }
+    |  INT_CONST  { $$.type = CONST; $$.con.i  = $1; $$.con.type = TYPE_INT;  }
+    | REAL_CONST  { $$.type = CONST; $$.con.r  = $1; $$.con.type = TYPE_REAL; }
+    | var         { $$ = $1; }
+    | '(' exp ')' { $$ = $2; }
+    | '-' exp %prec UMINUS { $$ = opr(UMINUS, 1, $2);     }
+    | '!' exp %prec UNEG   { $$ = opr('!'   , 1, $2);     }
+    | exp '+' exp          { $$ = opr('+'   , 2, $1, $3); }
+    | exp '-' exp          { $$ = opr('-'   , 2, $1, $3); }
+    | exp '*' exp          { $$ = opr('*'   , 2, $1, $3); }
+    | exp '/' exp          { $$ = opr('/'   , 2, $1, $3); }
+    | exp EQ  exp          { $$ = opr(EQ    , 2, $1, $3); }
+    | exp GE  exp          { $$ = opr(GE    , 2, $1, $3); }
+    | exp LE  exp          { $$ = opr(LE    , 2, $1, $3); }
+    | exp '>' exp          { $$ = opr('>'   , 2, $1, $3); }
+    | exp '<' exp          { $$ = opr('<'   , 2, $1, $3); }
+    | exp AND exp          { $$ = opr(AND   , 2, $1, $3); }
+    | exp OR  exp          { $$ = opr(OR    , 2, $1, $3); }
     ;
 
 %%
@@ -164,6 +167,29 @@ exp : CHAR_CONST   { printf("Reconheci constante de caractere\n"); }
 void yyerror(char *error)
 {
     printf("%s\n", error);
+}
+
+struct tree_node opr(int oper, int nops, ...)
+{
+    printf("op = %d/%c\n", oper, oper);
+
+    struct tree_node *nodes = malloc(sizeof (struct tree_node) * nops);
+
+    if (NULL == nodes)
+    {
+        yyerror("out of memory");
+    }
+
+    va_list ap;
+
+    va_start(ap, nops);
+    for (int op_i = 0; op_i < nops; op_i++)
+    {
+        nodes[op_i] = va_arg(ap, struct tree_node);
+    }
+    va_end(ap);
+
+    return (struct tree_node){OPR, .opr = {oper, nops, nodes}};
 }
 
 int main(void)

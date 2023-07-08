@@ -1,4 +1,4 @@
-CFLAGS=-Wpedantic -Wall -Wextra
+CFLAGS=-Wpedantic -Wall -Wextra -fsanitize=address -g3
 
 all:fortall
 
