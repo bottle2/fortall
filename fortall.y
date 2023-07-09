@@ -168,6 +168,7 @@ exp : CHAR_CONST  { $$.type = CONST; $$.con.c  = $1; $$.con.type = TYPE_CHAR; }
 void yyerror(char *error)
 {
     printf("%s\n", error);
+    exit(EXIT_FAILURE);
 }
 
 struct tree_node opr(int oper, int nops, ...)
