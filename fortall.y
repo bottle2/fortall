@@ -26,7 +26,10 @@ void show_variables(void)
             default:                name_char = '?';    break;
         }
 
-        printf("A %i-esima variavel mais cringe do sistema é:\t%s\t%c \n", i, vars[i].name, name_char);
+        printf(
+            "A %i-esima variavel %s %c %s\n",
+            i, vars[i].name, name_char, vars[i].is_initialized ? "yes" : "no"
+        );
     }
 }
 
@@ -105,10 +108,10 @@ struct tree_node opr(int oper, int nops, ...);
 
 %%
 
-programa : PUBLICO ESTATICO ABISMO PRINCIPAL '(' ')' '{' declaracao '}' { printf("Reconheci um programa\n"); show_variables(); exit(0); }
+programa : PUBLICO ESTATICO ABISMO PRINCIPAL '(' ')' '{' declaracao '}' { printf("Terminei o programa\n"); show_variables(); exit(0); }
 	 ;
 
-declaracao : dec_variavel lista_comando { printf("Reconheci uma declaracao\n"); }
+declaracao : dec_variavel lista_comando { (void)ex(&$2); }
 	   ;
 
 dec_variavel : tipo lista_nomes ';' dec_variavel { printf("Reconheci decl de var\n"); }
@@ -169,7 +172,9 @@ void yyerror(char *error)
 
 struct tree_node opr(int oper, int nops, ...)
 {
+#if 0
     printf("op = %d/%c\n", oper, oper);
+#endif
 
     struct tree_node *nodes = malloc(sizeof (struct tree_node) * nops);
 
@@ -190,8 +195,24 @@ struct tree_node opr(int oper, int nops, ...)
     return (struct tree_node){OPR, .opr = {oper, nops, nodes}};
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: fortall <source-code>\n");
+        exit(EXIT_FAILURE);
+    }
+
+    extern FILE *yyin;
+
+    yyin = fopen(argv[1], "rb");
+
+    if (NULL == yyin)
+    {
+        perror("Nao posso interpretar arquivo.");
+        return EXIT_FAILURE;
+    }
+
     yyparse();
     return 0;
 }

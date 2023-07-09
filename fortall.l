@@ -90,11 +90,11 @@ void yyerror(char *);
 <STRING>.    { check_buf(); *s++ = *yytext; }
 
  /* Literal de caractere. */
-'\\t'  { yylval.char_const =    '\t'; return CHAR_CONST; }
-'\\n'  { yylval.char_const =    '\n'; return CHAR_CONST; }
-'\\\"' { yylval.char_const =    '\\'; return CHAR_CONST; }
-'\\\\' { yylval.char_const =    '\"'; return CHAR_CONST; }
-'.'    { yylval.char_const = *yytext; return CHAR_CONST; }
+'\\t'  { yylval.char_const =    '\t';   return CHAR_CONST; }
+'\\n'  { yylval.char_const =    '\n';   return CHAR_CONST; }
+'\\\"' { yylval.char_const =    '\\';   return CHAR_CONST; }
+'\\\\' { yylval.char_const =    '\"';   return CHAR_CONST; }
+'.'    { yylval.char_const = yytext[1]; return CHAR_CONST; }
 
  /* Números inteiros. */
 [0-9]+ { yylval.int_const = atoi(yytext); return INT_CONST; }

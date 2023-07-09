@@ -55,4 +55,7 @@ struct var
 };
 
 extern struct var vars[];
+
+struct generic_value ex(struct tree_node tnd[static 1]);
+
 #endif

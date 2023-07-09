@@ -25,9 +25,12 @@ publico estatico abismo principal()
         escrever("banido do RU pra sempre!!\n");
         escrever("voce quer saber porque? (Y/N) ");
         ler(resposta);
-        se ('Y' == resposta) entao
+        escrever("sua resposta = ");
+        escrever(resposta);
+        escrever("\n");
+        se ( /*89*/ 'Y' == resposta) entao
             escrever("Essa informacao eh sigilosa.\n");
-        senao se ('N' == resposta) entao
+        senao se (/*78*/ 'N' == resposta) entao
             escrever("OK.\n");
         senao {
             escrever("Motivos:\n");
