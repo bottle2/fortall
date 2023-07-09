@@ -6,7 +6,6 @@
 
 #include "fortall.h"
 
-void yyerror(char *);
 int yylex(void);
 
 int n_var;
@@ -79,9 +78,8 @@ struct tree_node opr(int oper, int nops, ...);
     int      int_const;
     double  real_const;
     int     var_id;
-
-    enum   type      type;
     struct tree_node node;
+    enum   type      type;
 }
 
 %token <string_literal> STRING_LITERAL

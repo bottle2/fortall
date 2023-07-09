@@ -6,7 +6,7 @@
 #define CAPACITY_STRING 4095
 
 int var_find_or_set(char name[static 2]);
-
+void yyerror(char *error);
 /* constants */
 struct generic_value
 {
@@ -54,4 +54,5 @@ struct var
     struct generic_value value;
 };
 
+extern struct var vars[];
 #endif
