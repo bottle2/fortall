@@ -8,6 +8,8 @@
 
 int yylex(void);
 
+extern int yylineno;
+
 int n_var;
 
 struct var vars[CAPACITY_VAR];
@@ -137,7 +139,7 @@ comando : SE       '(' exp ')' ENTAO comando %prec SEX     { $$ = opr(SE      , 
         | '{' lista_comando '}'                            { $$ = $2; }
         ;
 
-var : VAR_ID { $$ = (struct tree_node){VID, .var_id = $1}; }
+var : VAR_ID { $$ = (struct tree_node){VID, .var_id = $1, yylineno}; }
 
 lista_comando : lista_comando comando { $$ = opr(';', 2, $1, $2); }
 	      | comando               { $$ = $1; }
@@ -167,7 +169,7 @@ exp : CHAR_CONST  { $$.type = CONST; $$.con.c  = $1; $$.con.type = TYPE_CHAR; }
 
 void yyerror(char *error)
 {
-    printf("%s\n", error);
+    printf("%s", error);
     exit(EXIT_FAILURE);
 }
 

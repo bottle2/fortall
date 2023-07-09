@@ -109,7 +109,10 @@ void yyerror(char *);
                        }
 
  /* Espaço em branco. */
-[ \t\n]+
+[ \t]+
+
+ /* Nova linha. */
+\n { yylineno++; }
 
  /* Caracteres desconhecidos. */
 . yyerror("Caractere desconhecido");

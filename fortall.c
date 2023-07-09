@@ -5,6 +5,7 @@
 
 #include "fortall.h"
 #include "y.tab.h"
+#include "util.h"
 
 struct generic_value empty;
 
@@ -117,16 +118,13 @@ struct generic_value ex(struct tree_node tnd[static 1])
         {
             struct var* v = &vars[tnd->var_id];
 
-            // TODO: Escrever o nome da variavel.
             if(TYPE_UNDEFINED == v->value.type) 
             {
-                printf("variavel (undef) %s\n", v->name);
-                yyerror("Erro (interpretador): a variavel nao foi declarada previamente.");
+		yyerror(util_ifmt("[sem. @ %d] variavel nao declarada: %s", tnd->line, v->name));
             }
             if(!v->is_initialized)
             {
-                printf("variavel (init) %s\n", v->name);
-                yyerror("Erro (interpretador): a variavel nao foi inicializada previamente.");
+		yyerror(util_ifmt("[sem. @ %d] variavel nao inicializada: %s", tnd->line, v->name));
             }
             return vars[tnd->var_id].value;
         }

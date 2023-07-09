@@ -44,6 +44,7 @@ struct tree_node
         struct op_tree_node   opr;
         char                 *str;
     };
+    int line;
 };
 
 //Definição formal da Variavel
