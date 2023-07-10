@@ -1,0 +1,8 @@
+publico estatico abismo principal() {
+    inteiro nelson;
+    real    dinheiro;
+
+    nelson = 1;
+
+    caractere hamlet;
+}

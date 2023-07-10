@@ -1,0 +1,4 @@
+publico estatico abismo principal () {
+    escrever("Reconhece numero e depois uma variavel, ai acusa erro de sintaxe:\n");
+    1variavel_ou_que?
+}

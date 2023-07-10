@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "fortall.h"
 #include "y.tab.h"
+#include "util.h"
 
 char  buf[CAPACITY_STRING];
 char *s;
@@ -11,8 +12,7 @@ static inline void check_buf(void)
 {
     if (s - buf == CAPACITY_STRING - 1)
     {
-        fprintf(stderr, "String is too long.\n");
-        exit(EXIT_FAILURE);
+        yyerror("erro lexico - String eh muito longa.\n");
     }
 }
 
@@ -74,15 +74,14 @@ void yyerror(char *);
 <STRING>\\t  { check_buf(); *s++ = '\t'; }
 <STRING>\\\" { check_buf(); *s++ = '\"'; }
 <STRING>\\\\ { check_buf(); *s++ = '\\'; }
-<STRING>\n   { fprintf(stderr, "Invalid string\n"); exit(EXIT_FAILURE); }
+<STRING>\n   { yyerror("erro lexico - String nao acaba na mesma linha.\n"); }
 <STRING>\"   {
                  *s = '\0';
                  BEGIN 0;
                  yylval.string_literal = malloc(strlen(buf) + 1);
                  if (NULL == yylval.string_literal)
                  {
-                     fprintf(stderr, "No memory for string.\n");
-                     exit(EXIT_FAILURE);
+                     yyerror("erro interno - Nao ha memoria para armazenar a string.\n");
                  }
                  strcpy(yylval.string_literal, buf);
                  return STRING_LITERAL;
@@ -115,7 +114,7 @@ void yyerror(char *);
 \n { yylineno++; }
 
  /* Caracteres desconhecidos. */
-. yyerror("Caractere desconhecido");
+. yyerror("erro lexico - Caractere desconhecido.\n");
 
 %%
 

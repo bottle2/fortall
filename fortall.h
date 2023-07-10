@@ -5,6 +5,8 @@
 #define CAPACITY_VAR    4095
 #define CAPACITY_STRING 4095
 
+extern int force_lineno;
+
 int var_find_or_set(char name[static 2]);
 void yyerror(char *error);
 /* constants */

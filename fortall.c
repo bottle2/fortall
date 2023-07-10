@@ -7,16 +7,18 @@
 #include "y.tab.h"
 #include "util.h"
 
+int force_lineno = -1;
+
 struct generic_value empty;
 
 static bool gvtob (struct generic_value gv)
 { 
     switch (gv.type)
     {
-        case     TYPE_INT:  return gv.i;        break;
-        case     TYPE_REAL: return gv.r;        break;
-        case     TYPE_CHAR: return gv.c;        break;
-        default: yyerror("estorou a bagaça.");  break;
+        case     TYPE_INT:  return gv.i;          break;
+        case     TYPE_REAL: return gv.r;          break;
+        case     TYPE_CHAR: return gv.c;          break;
+        default: assert(!"Tipo eh desconhecido"); break;
     }
     return false;
 }
@@ -118,13 +120,15 @@ struct generic_value ex(struct tree_node tnd[static 1])
         {
             struct var* v = &vars[tnd->var_id];
 
+            force_lineno = tnd->line;
+
             if(TYPE_UNDEFINED == v->value.type) 
             {
-		yyerror(util_ifmt("[sem. @ %d] variavel nao declarada: %s", tnd->line, v->name));
+		yyerror(util_ifmt("erro semantico - Variavel nao declarada: %s", v->name));
             }
             if(!v->is_initialized)
             {
-		yyerror(util_ifmt("[sem. @ %d] variavel nao inicializada: %s", tnd->line, v->name));
+		yyerror(util_ifmt("erro semantico - Variavel nao inicializada: %s", v->name));
             }
             return vars[tnd->var_id].value;
         }
@@ -186,7 +190,7 @@ struct generic_value ex(struct tree_node tnd[static 1])
                                 case TYPE_INT:  vars[tnd->opr.op[0].var_id].value.i = res.i;     break;
                                 case TYPE_REAL: vars[tnd->opr.op[0].var_id].value.i = res.r;     break; // Se for um double, o C por padrão vai truncar para converter implicitamente para inteiro;
                                 case TYPE_CHAR: vars[tnd->opr.op[0].var_id].value.i = res.c;     break; // Se for um char, o C por padrão vai pegar o valor inteiro que representa o char em ASCII
-                                default: yyerror("Erro (Interpretador): Tipo não existente durante atribuição (Origem) int <- ?.");   break;
+                                default: assert(!"Resposta tem tipo indefinido."); break;
                             }
                             break;
                         case TYPE_REAL:
@@ -195,7 +199,7 @@ struct generic_value ex(struct tree_node tnd[static 1])
                                 case TYPE_INT:  vars[tnd->opr.op[0].var_id].value.r = res.i;     break; // Se for um inteiro, o C faz a conversão implicita.
                                 case TYPE_REAL: vars[tnd->opr.op[0].var_id].value.r = res.r;     break; 
                                 case TYPE_CHAR: vars[tnd->opr.op[0].var_id].value.r = res.c;     break; // Se for um char, o C por padrão vai perar o valor inteiro que representa o char em ASCII e depois fazer uma conversão implicita para real
-                                default: yyerror("Erro (Interpretador): Tipo não existente durante atribuição (Origem). real <- ?");   break;
+                                default: assert(!"Resposta tem tipo indefinido."); break;
                             }
                             break;
                         case TYPE_CHAR:                             
@@ -204,12 +208,12 @@ struct generic_value ex(struct tree_node tnd[static 1])
                                 case TYPE_INT:  vars[tnd->opr.op[0].var_id].value.c = res.i;     break; // Se for um inteiro, o C faz a conversão implicita (todo char é do tipo inteiro em C, porém com o tamanho menor).
                                 case TYPE_REAL: vars[tnd->opr.op[0].var_id].value.c = res.r;     break; // Se for um real, converte para inteiro de maneira implicita e posteriormente o resultado é o mesmo do exemplo acima.
                                 case TYPE_CHAR: vars[tnd->opr.op[0].var_id].value.c = res.c;     break; 
-                                default: yyerror("Erro (Interpretador): Tipo não existente durante atribuição (Origem). char <- ?");   break;
+                                default: assert(!"Resposta tem tipo indefinido."); break;
                             }
                             break;
                         default: 
-                            yyerror("Erro (Interpretador): Tipo não existente durante atribuição (Destino).");   break; 
-                            break;
+                            assert(!"Variavel de destino tem tipo desconhecido."); break; 
+                        break;
                     }
                 }
                     break;
@@ -224,7 +228,7 @@ struct generic_value ex(struct tree_node tnd[static 1])
                             case TYPE_INT:  printf("%i", res.i);     break; // Se for um inteiro, o C faz a conversão implicita (todo char é do tipo inteiro em C, porém com o tamanho menor).
                             case TYPE_REAL: printf("%f", res.r);     break; // Se for um real, converte para inteiro de maneira implicita e posteriormente o resultado é o mesmo do exemplo acima.
                             case TYPE_CHAR: printf("%c", res.c);     break; 
-                            default: yyerror("Erro (Interpretador): Tipo não existente durante atribuição (Origem).");   break;
+                            default: assert(!"Nao pode escrever sem tipo"); break;
                         }                        
                     }
                     break;
@@ -236,7 +240,7 @@ struct generic_value ex(struct tree_node tnd[static 1])
                         case TYPE_INT:  scanf(" %i", &vars[tnd->opr.op[0].var_id].value.i);     break; // Isso é culpa do programador, ele não deveria ler uma variável que não seja do tipo texto (caracter/string)
                         case TYPE_REAL: scanf(" %lf", &vars[tnd->opr.op[0].var_id].value.r);     break; // Isso é culpa do programador, ele não deveria ler uma variável que não seja do tipo texto (caracter/string)
                         case TYPE_CHAR: scanf(" %c", &vars[tnd->opr.op[0].var_id].value.c);     break; 
-                        default: yyerror("Erro (Interpretador): Tipo não existente durante atribuição (Origem).");   break;
+                        default: assert(!"Nao pode ler e armazenar em variavel sem tipo"); break;
                     }   
                     /* code */
                     break;
@@ -290,8 +294,7 @@ struct generic_value ex(struct tree_node tnd[static 1])
             assert(!"Erro (Interpretador): não foi possível executar uma STRING.\n");
             break;
         default:
-            // TODO: Definir mensagem de erro mais clara. 
-            yyerror("Erro (Interpretador): não existe esse tipo de tree node.\n");
+            assert(!"não existe esse tipo de tree node.");
             break;
     }
     return empty;

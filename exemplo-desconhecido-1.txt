@@ -1,0 +1,4 @@
+publico estatico abismo principal () {
+    escrever("Testando token desconhecido...\n");
+    $$$$$$ proibido dinheiro
+}

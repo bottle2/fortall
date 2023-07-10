@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 // Inline string formatting.
+// TODO Document better.
 static inline char *util_ifmt(char fmt[static 1], ...)
 {
     static _Thread_local char string[80];

@@ -6,7 +6,9 @@ publico estatico abismo principal()
     real      saldo_do_RU;
 
     vasco_da_gama =  0;
-    saldo_do_RU   = -1;
+    /*saldo_do_RU   = -1;*/
+
+    /*escrever(rei_henrique_oitavo);*/
 
     /* TODO Refatorar depois */
     enquanto (vasco_da_gama < 3)

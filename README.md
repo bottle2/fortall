@@ -4,28 +4,28 @@
 
 # Requisitos
 
-- [ ] Tipos inteiros e reais
-- [ ] Funções de entrada e saída
-  - [ ] Ler
-  - [ ] Escrever
-- [ ] Estrutura de repetição Enquanto
-- [ ] Estruturas condicionais
-  - [ ] Se Entao
-  - [ ] Se Entao Senao
+- [X] Tipos caractere, inteiro e real
+- [X] Funções de entrada e saída
+  - [X] Ler
+  - [X] Escrever
+- [X] Estrutura de repetição Enquanto
+- [X] Estruturas condicionais
+  - [X] Se Entao
+  - [X] Se Entao Senao
 - [ ] Operadores aritméticos
-  - [ ] Soma          +
-  - [ ] Subtração     -
+  - [X] Soma          +
+  - [X] Subtração     -
   - [ ] Multiplicação *
   - [ ] Divisão       /
 - [ ] Operadores relacionais
-  - [ ] Igualdade      ==
+  - [X] Igualdade      ==
   - [ ] Diferença      !=
   - [ ] Menor          <
   - [ ] Menor ou igual <=
   - [ ] Maior          >
   - [ ] Maior ou igual >=
-- [ ] Comentários `/* ... */`
-- [ ] Atribuição =
+- [X] Comentários `/* ... */`
+- [X] Atribuição =
 - [ ] Strings "..." com escapes \n e \t
 
 # Requisitos não implementados
@@ -40,5 +40,22 @@
 - Registros
 - Outros tipos de dados
 
-# Rascunho
- TODO "/*"  ([^*]|(\*[^/]?))*   "*/"
+# Erros possíveis
+
+## Erros léxicos
+
+- String não terminada (chegou ao fim de linha) 
+- String muito comprida
+
+## Erros sintáticos
+
+- Erro sintático.
+
+## Erros semânticos
+
+- Uso de variável não declarado.
+- Uso de variável não inicializada.
+
+## Erros internos
+
+- Falta de memória

@@ -18,20 +18,19 @@ void show_variables(void)
 {
     for (int i = 0; i < n_var; i++)
     {
-        char name_char;
+        printf(
+            "A %i-esima variavel %s %s de tipo ",
+            i, vars[i].name, vars[i].is_initialized ? "inicializada" : "nao inicializada"
+        );
+
         switch(vars[i].value.type)
         {
-            case TYPE_CHAR:         name_char = 'C';    break;
-            case TYPE_INT:          name_char = 'I';    break;
-            case TYPE_REAL:         name_char = 'R';    break;
-            case TYPE_UNDEFINED:    name_char = 'U';    break;
-            default:                name_char = '?';    break;
+            case TYPE_CHAR:      printf("caractere value=%c\n", vars[i].value.c); break;
+            case TYPE_INT:       printf("inteiro value=%i\n", vars[i].value.i); break;
+            case TYPE_REAL:      printf("real value=%f\n", vars[i].value.r); break;
+            case TYPE_UNDEFINED: printf("desconhecido value=_\n"); break;
+            default:             printf("nao classificado value=?\n"); break;
         }
-
-        printf(
-            "A %i-esima variavel %s %c %s\n",
-            i, vars[i].name, name_char, vars[i].is_initialized ? "yes" : "no"
-        );
     }
 }
 
@@ -46,19 +45,16 @@ int var_find_or_set(char name[static 2])
 
     if (CAPACITY_VAR == var_i)
     {
-        fprintf(stderr, "Can't store this much variable.\n");
-        exit(EXIT_FAILURE);
+        yyerror("erro interno - Nao pode haver tantas variaveis.\n");
     }
 
     if (var_i == n_var)
     {
         if (NULL == (vars[var_i].name = malloc(strlen(name) + 1)))
         {
-            fprintf(stderr, "Can't store variable name.\n");
-            exit(EXIT_FAILURE);
+            yyerror("erro interno - Nao ha memoria para o nome da variavel.\n");
         }
 
-        printf("Defini uma variável foda de nome %s. \n", name);
         (void)strcpy(vars[var_i].name, name);
         n_var++;
     }
@@ -110,13 +106,13 @@ struct tree_node opr(int oper, int nops, ...);
 
 %%
 
-programa : PUBLICO ESTATICO ABISMO PRINCIPAL '(' ')' '{' declaracao '}' { printf("Terminei o programa\n"); show_variables(); exit(0); }
+programa : PUBLICO ESTATICO ABISMO PRINCIPAL '(' ')' '{' declaracao '}' { printf("Fim da execucao.\n"); show_variables(); exit(0); }
 	 ;
 
 declaracao : dec_variavel lista_comando { (void)ex(&$2); }
 	   ;
 
-dec_variavel : tipo lista_nomes ';' dec_variavel { printf("Reconheci decl de var\n"); }
+dec_variavel : tipo lista_nomes ';' dec_variavel
              | 
              ;
 
@@ -169,16 +165,12 @@ exp : CHAR_CONST  { $$.type = CONST; $$.con.c  = $1; $$.con.type = TYPE_CHAR; }
 
 void yyerror(char *error)
 {
-    printf("%s", error);
+    printf("Na linha %d: %s", force_lineno > 0 ? force_lineno : yylineno, error);
     exit(EXIT_FAILURE);
 }
 
 struct tree_node opr(int oper, int nops, ...)
 {
-#if 0
-    printf("op = %d/%c\n", oper, oper);
-#endif
-
     struct tree_node *nodes = malloc(sizeof (struct tree_node) * nops);
 
     if (NULL == nodes)
