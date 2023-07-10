@@ -1,3 +1,8 @@
+# Autores
+
+Bento e Thiago, alunos de Ciência da Computação da UFSM,
+disciplina de Compiladores com o professor Giovani Librelotto (2023).
+
 # Características gerais
 
 - Declaração de variáveis ocorre no início
@@ -12,21 +17,21 @@
 - [X] Estruturas condicionais
   - [X] Se Entao
   - [X] Se Entao Senao
-- [ ] Operadores aritméticos
+- [X] Operadores aritméticos
   - [X] Soma          +
   - [X] Subtração     -
-  - [ ] Multiplicação *
-  - [ ] Divisão       /
-- [ ] Operadores relacionais
+  - [X] Multiplicação *
+  - [X] Divisão       /
+- [X] Operadores relacionais
   - [X] Igualdade      ==
-  - [ ] Diferença      !=
-  - [ ] Menor          <
-  - [ ] Menor ou igual <=
-  - [ ] Maior          >
-  - [ ] Maior ou igual >=
+  - [X] Diferença      !=
+  - [X] Menor          <
+  - [X] Menor ou igual <=
+  - [X] Maior          >
+  - [X] Maior ou igual >=
 - [X] Comentários `/* ... */`
 - [X] Atribuição =
-- [ ] Strings "..." com escapes \n e \t
+- [X] Strings "..." com escapes \n e \t
 
 # Requisitos não implementados
 
